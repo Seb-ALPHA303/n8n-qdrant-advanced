@@ -3,6 +3,8 @@ import {
     INodeExecutionData,
     INodeType,
     INodeTypeDescription,
+    NodeApiError,
+    NodeOperationError,
   } from 'n8n-workflow';
   import { QdrantClient } from '@qdrant/js-client-rest';
   
@@ -17,7 +19,6 @@ import {
       description: 'Full Qdrant API — collections & points, with JSON expressions everywhere',
       defaults: {
         name: 'Qdrant (Advanced)',
-        color: '#00AA55',
       },
       inputs: ['main'],
       outputs: ['main'],
@@ -32,18 +33,19 @@ import {
           displayName: 'Operation',
           name: 'operation',
           type: 'options',
+          noDataExpression: true,
           options: [
+            { name: 'Count Points', value: 'countPoints' },
             { name: 'Create Collection', value: 'createCollection' },
             { name: 'Delete Collection', value: 'deleteCollection' },
-            { name: 'List Collections',  value: 'listCollections'  },
+            { name: 'Delete Points', value: 'deletePoints' },
             { name: 'Get Collection Info', value: 'getCollection' },
+            { name: 'Get Points by IDs', value: 'getPoints' },
+            { name: 'List Collections', value: 'listCollections' },
+            { name: 'Search Points', value: 'searchPoints' },
             { name: 'Update Collection', value: 'updateCollection' },
-            { name: 'Count Points',    value: 'countPoints'    },
-            { name: 'Get Points by IDs', value: 'getPoints'     },
-            { name: 'Search Points',    value: 'searchPoints'   },
-            { name: 'Upsert Points',    value: 'upsertPoints'   },
-            { name: 'Update Points',    value: 'updatePoints'   },
-            { name: 'Delete Points',    value: 'deletePoints'   },
+            { name: 'Update Points', value: 'updatePoints' },
+            { name: 'Upsert Points', value: 'upsertPoints' },
           ],
           default: 'searchPoints',
         },
@@ -70,7 +72,7 @@ import {
             'Raw Qdrant collection config (vectors, replication_factor, etc). Expressions like {{$fromAI(...)}} work.',
         },
         {
-          displayName: 'Point IDs (JSON array)',
+          displayName: 'Point IDs (JSON Array)',
           name: 'pointIds',
           type: 'json',
           typeOptions: { alwaysOpenEditWindow: true },
@@ -83,7 +85,7 @@ import {
           description: 'Array of point IDs, e.g. [1,2,3]. Supports expressions.',
         },
         {
-          displayName: 'Points (JSON array)',
+          displayName: 'Points (JSON Array)',
           name: 'points',
           type: 'json',
           typeOptions: { alwaysOpenEditWindow: true },
@@ -97,7 +99,7 @@ import {
             'Array of point objects: { id, vector: [...], payload: {...} }. Supports expressions.',
         },
         {
-          displayName: 'Search Vector (JSON array)',
+          displayName: 'Search Vector (JSON Array)',
           name: 'searchVector',
           type: 'json',
           typeOptions: { alwaysOpenEditWindow: true },
@@ -123,11 +125,12 @@ import {
           displayName: 'Limit',
           name: 'limit',
           type: 'number',
-          default: 10,
+          default: 50,
+          typeOptions: { minValue: 1, maxValue: 1000 },
           displayOptions: {
             show: { operation: ['searchPoints'] },
           },
-          description: 'Max number of search results',
+          description: 'Max number of results to return',
         },
       ],
     };
@@ -219,7 +222,7 @@ import {
               throw new Error(`Unsupported operation "${operation}"`);
           }
         } catch (e) {
-          throw new Error(`QdrantAdvanced Error [${operation}]: ${(e as Error).message}`);
+          throw new NodeApiError(this.getNode(), e);
         }
   
         returnData.push({ json: response });

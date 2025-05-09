@@ -1,20 +1,6 @@
 {
-  "name": "n8n-nodes-<...>",
+  "name": "n8n-nodes-qdrant-advanced",
   "version": "0.1.0",
-  "description": "",
-  "keywords": [
-    "n8n-community-node-package"
-  ],
-  "license": "MIT",
-  "homepage": "",
-  "author": {
-    "name": "",
-    "email": ""
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/<...>/n8n-nodes-<...>.git"
-  },
   "engines": {
     "node": ">=18.10",
     "pnpm": ">=9.1"
@@ -44,10 +30,14 @@
       "dist/nodes/HttpBin/HttpBin.node.js"
     ]
   },
+  "dependencies": {
+    "@qdrant/js-client-rest": "^1.0.0"
+  },
   "devDependencies": {
     "@typescript-eslint/parser": "^7.15.0",
     "eslint": "^8.56.0",
     "eslint-plugin-n8n-nodes-base": "^1.16.1",
+    "eslint-plugin-jsdoc": "^44.0.0",     
     "gulp": "^4.0.2",
     "prettier": "^3.3.2",
     "typescript": "^5.5.3"

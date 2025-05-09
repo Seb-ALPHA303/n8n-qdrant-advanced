@@ -96,7 +96,7 @@ import {
             },
           },
           description:
-            'Array of point objects: { id, vector: [...], payload: {...} }. Supports expressions.',
+            'Array of point objects: { ID, vector: [...], payload: {...} }. Supports expressions.',
         },
         {
           displayName: 'Search Vector (JSON Array)',
@@ -126,7 +126,7 @@ import {
           name: 'limit',
           type: 'number',
           default: 50,
-          typeOptions: { minValue: 1, maxValue: 1000 },
+          typeOptions: { minValue: 1},
           displayOptions: {
             show: { operation: ['searchPoints'] },
           },
